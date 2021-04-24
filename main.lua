@@ -256,7 +256,7 @@ function toss(tunnel)
 			end
 			-- play nice sound
 		else
-
+			player.statusMessage = "The arrow misses."
 			tossedCave = caves[caveNum]
 			for i=1,tossedCave:getNumAdjCaves() do 
 				adjCaveNum = tossedCave:getNeighborDownTunnel(i)
@@ -275,6 +275,7 @@ function toss(tunnel)
 					wumpusCave.contents = "wumpus"
 					adjCave.contents = "empty"
 				end
+
 			end
 		end
 	else
