@@ -94,11 +94,11 @@ function love.update(dt)
 		scene.cave:markAsVisited()
 		if scene.cave.contents == "wumpus" then
 			player.alive = false
-			player.statusMessage = "YOU DIED!"
+			player.statusMessage = "A wumpus kills you!"
 			-- play dead sound
 		elseif scene.cave.contents == "pit" then
 			player.alive = false
-			player.statusMessage = "YOU DIED!"
+			player.statusMessage = "You fell into a pit and died!"
 		elseif scene.cave.contents == "bats" then
 			-- move to random empty cave
 			scene.shake = 1000
