@@ -107,6 +107,7 @@ function love.update(dt)
 		elseif scene.cave.contents == "pit" then
 			player.alive = false
 			player.statusMessage = "You fell into a pit and died!"
+			sounds.death:play()
 		elseif scene.cave.contents == "bats" then
 			-- move to random empty cave
 			scene.shake = 1000
@@ -119,8 +120,7 @@ function love.update(dt)
 			player.statusMessage = player.statusMessage
 					.. "You were picked up in a whirlwind of bats!"
 		
-		else
-			checkAdjCaveContents()
+		else checkAdjCaveContents()
 		end
 	end
 	if scene.dim >= -0.1 and scene.dim < 0 and player.alive then
@@ -282,8 +282,8 @@ function toss(tunnel)
 					player.statusMessage = "The arrow misses and you scared off the wumpus."
 					if (wumpusCave == scene.cave) then
 						player.statusMessage = "A wumpus moved into your cave!"
-						-- growling noise
 						player.alive = false
+						sounds.death:play()
 					end
 					wumpusCave.contents = "wumpus"
 					adjCave.contents = "empty"
