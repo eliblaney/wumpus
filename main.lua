@@ -116,5 +116,10 @@ function love.draw()
 	love.graphics.print(scene.cave.name, 25, 25, 0, 1.5, 1.5)
 	love.graphics.setColor(0, 0, 0, math.abs(scene.dim))
 	love.graphics.rectangle('fill', 0, 0, 808, 800)
+
+	if not player.alive then
+		love.graphics.setColor(1, 0, 0, math.abs(scene.dim))
+		love.graphics.print(player.statusMessage, 250, 300, 0, 5, 5)
+	end
 end
 
