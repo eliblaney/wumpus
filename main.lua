@@ -25,7 +25,7 @@ function love.load()
 end
 
 function love.update(dt)
-	-- detect go to cave
+	-- detect which cave to go to (if necessary)
 	caveDir = -1
 	if player.x <= scene.minX then caveDir = 0 end
 	if player.x >= scene.maxX then caveDir = 1 end
@@ -43,8 +43,10 @@ function love.update(dt)
 		player.y = 550
 		player.scale = 0.5
 		-- TODO: Change cave
+		-- play appropriate sounds
 	end
 	if scene.dim >= -0.1 and scene.dim < 0 then
+		-- allow player mobility
 		player.canMove = true
 		scene.dim = 0
 	end
