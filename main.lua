@@ -177,36 +177,33 @@ function checkAdjCaveContents()
 end
 
 function love.draw()
+	-- cave & player models
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.draw(caveImg, 0, 0)
 	love.graphics.draw(player.img, player.x, player.y, 0, player.scale, player.scale, 250, 450)
+
+	-- cave name and status message
 	love.graphics.setColor(0, 0, 0, 1)
 	love.graphics.print(scene.cave.name, 25, 25, 0, 1.5, 1.5)
 	love.graphics.print(player.statusMessage, 25, 50, 0, 1.5, 1.5)
 
-	--adjacent caves
-	--left
+	-- adjacent cave names
+	-- left
 	love.graphics.print(caves[scene.cave.adj[1]]:getName(), 25, 400, 0, 1.5, 1.5)
-	--right
+	-- right
 	love.graphics.print(caves[scene.cave.adj[2]]:getName(), 620, 400, 0, 1.5, 1.5)
-	--top
+	-- top
 	love.graphics.print(caves[scene.cave.adj[3]]:getName(), 350, 200, 0, 1.5, 1.5)
+	-- bottom
 	if (#scene.cave.adj >3) then
 		love.graphics.print(caves[scene.cave.adj[4]]:getName(), 400, 700, 0, 1.5, 1.5)
 	end
 
-
-
+	-- dim overlay
 	love.graphics.setColor(0, 0, 0, math.abs(scene.dim))
 	love.graphics.rectangle('fill', 0, 0, 808, 800)
 
-
-
-
-	-- for k,v in pairs(cave.adj) do
-	-- 	love.graphics.print(v.getName(), 25, 25, 0, 1.5, 1.5)
-	-- end
-
+	-- death screen
 	if not player.alive then
 		love.graphics.setColor(1, 0, 0, math.abs(scene.dim))
 		love.graphics.print(player.statusMessage, 250, 300, 0, 5, 5)
