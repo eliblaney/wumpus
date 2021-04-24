@@ -81,7 +81,7 @@ function love.update(dt)
 		player.y = 550
 		player.scale = 0.5
 		-- TODO: Change cave
-		scene.cave = caves[math.random(#scene.cave.adj) - 1]
+		scene.cave = caves[scene.cave.adj[math.random(#scene.cave.adj)] - 1]
 		if scene.cave.contents == "wumpus" then
 			player.alive = false
 			player.statusMessage = "YOU DIED!"
