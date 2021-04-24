@@ -68,6 +68,7 @@ function love.load()
 	sounds.bats = love.audio.newSource("sounds/bats.mp3", "stream")
 	sounds.wumpus = love.audio.newSource("sounds/wumpus.mp3", "stream")
 	sounds.death = love.audio.newSource("sounds/death.mp3", "stream")
+	sounds.hit = love.audio.newSource("sounds/hit.wav", "stream")
 	sounds.win = love.audio.newSource("sounds/win.wav", "stream")
 	sounds.music:setLooping(true)
 	sounds.music:play()
@@ -262,8 +263,10 @@ function toss(tunnel)
 			if numWumpi <= 0 then
 				player.statusMessage = "YOU WIN!"
 				player.alive = false
+				sounds.win:play()
+			else
+				sounds.hit:play()
 			end
-			sounds.win:play()
 		else
 			player.statusMessage = "The arrow misses."
 			tossedCave = caves[caveNum]
