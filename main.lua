@@ -23,6 +23,7 @@ function love.load()
 	player.canMove = true
 	player.alive = true
 	player.statusMessage = ""
+	player.grenades = 3 --FIX THIS
 
 	scene = {}
 	scene.minX = 200
@@ -114,6 +115,7 @@ function love.draw()
 	love.graphics.draw(player.img, player.x, player.y, 0, player.scale, player.scale, 250, 450)
 	love.graphics.setColor(0, 0, 0, 1)
 	love.graphics.print(scene.cave.name, 25, 25, 0, 1.5, 1.5)
+	love.graphics.print(player.statusMessage, 25, 50, 0, 1.5, 1.5)
 	love.graphics.setColor(0, 0, 0, math.abs(scene.dim))
 	love.graphics.rectangle('fill', 0, 0, 808, 800)
 
@@ -123,3 +125,43 @@ function love.draw()
 	end
 end
 
+function toss(tunnel) 
+	hitFlag = false
+	if (player.grenades > 0) then
+		player.grenades = player.grenades-1
+		caveNum = scene.cave.getNeighborDownTunnel(tunnel)
+
+		if (scene.cave.contents == "wumpus") then
+			scene.cave.contents = "empty"
+			wumpusCount = wumpusCount-1
+			hitFlag = true
+			-- play nice sound
+		end
+
+		tossedCave = caves[caveNum]
+		for i=1, tossedCave:getNumAdjacentCaves(), 1 do 
+			adjCaveNum = tossedCave.getNeighborDownTunnel(i)
+			adjCave = caves[adjCaveNum]
+
+			if (adjCaveNum.contents == "wumpus") then
+				repeat
+					wumpusCave = adjCave.adj[math.random(adjCave.getNumAdjacentCaves)]
+				until wumpusCave.contents == "empty"
+				if (wumpusCave == scene.cave) then
+					player.statusMessage = "A wumpus moved into your cave!"
+					-- growling noise
+					player.alive = false
+				end
+				wumpusCave.contents = "wumpus"
+				adjCave.contents = "empty"
+			end
+		end
+
+		if (hitFlag) then
+			player.statusMessage = "You stunned and captured a wumpus!"
+		else 
+			player.statusMessage = "The stun grenade missed."
+		end
+	end
+	player.statusMessage = "You have no stun grenades to throw!"
+end
