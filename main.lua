@@ -71,6 +71,7 @@ function love.load()
 	sounds.win = love.audio.newSource("sounds/win.wav", "stream")
 	sounds.music:setLooping(true)
 	sounds.music:play()
+	sounds.flapping = love.audio.newSource("sounds/flapping.wav", "stream")
 
 	font = love.graphics.newFont("fonts/Roboto-Regular.ttf", 24)
 
@@ -114,8 +115,10 @@ function love.update(dt)
 			until scene.cave.contents == "empty"
 			scene.cave:markAsVisited()
 			checkAdjCaveContents()
+			sounds.bats:play()
 			player.statusMessage = player.statusMessage
 					.. "You were picked up in a whirlwind of bats!"
+		
 		else
 			checkAdjCaveContents()
 		end
@@ -184,7 +187,7 @@ function checkAdjCaveContents()
 		if caves[scene.cave.adj[i]].contents == "bats" then
 			player.statusMessage = player.statusMessage
 			.. "What's that flapping of wings nearby?\n"
-			sounds.bats:play()
+			sounds.flapping:play()
 		end
 	end
 end
