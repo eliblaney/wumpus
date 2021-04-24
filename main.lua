@@ -24,6 +24,7 @@ function love.load()
 	player.alive = true
 	player.statusMessage = ""
 	player.grenades = 3 --FIX THIS
+	player.grenadeReady = false
 
 	scene = {}
 	scene.minX = 200
@@ -80,6 +81,7 @@ function love.update(dt)
 		player.x = 300
 		player.y = 550
 		player.scale = 0.5
+		player.grenadeReady = false
 		scene.cave = caves[scene.cave.adj[caveDir+1]]
 		scene.cave:markAsVisited()
 		if scene.cave.contents == "wumpus" then
@@ -124,14 +126,25 @@ function love.update(dt)
 			and player.scale < scene.maxZ
 			then
 			player.scale = player.scale + player.speed*dt/200
-		elseif love.keyboard.isDown("1") then
+		elseif player.grenadeReady and love.keyboard.isDown("1") then
 			toss(1)
-		elseif love.keyboard.isDown("2") then
+			player.grenadeReady = false
+		elseif player.grenadeReady and love.keyboard.isDown("2") then
 			toss(2)
-		elseif love.keyboard.isDown("3") then
+			player.grenadeReady = false
+		elseif player.grenadeReady and love.keyboard.isDown("3") then
 			toss(3)
-		elseif love.keyboard.isDown("4") then
+			player.grenadeReady = false
+		elseif player.grenadeReady and love.keyboard.isDown("4") then
 			toss(4)
+			player.grenadeReady = false
+		elseif not player.grenadeReady and love.keyboard.isDown("g") then
+			if player.grenades > 0 then
+				player.grenadeReady = true
+				player.statusMessage = "You hold up your grenade"
+			else 
+				player.statusMessage = "You have no stun grenades to throw!"
+			end
 		end 
 	end
 end
