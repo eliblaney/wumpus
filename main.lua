@@ -269,6 +269,10 @@ function toss(tunnel)
 			end
 		else
 			player.statusMessage = "The arrow misses."
+			if player.grenades == 0 then
+				player.statusMessage = "You ran out of arrows!"
+				player.alive = false
+			end
 			tossedCave = caves[caveNum]
 			for i=1,tossedCave:getNumAdjCaves() do 
 				adjCaveNum = tossedCave:getNeighborDownTunnel(i)
