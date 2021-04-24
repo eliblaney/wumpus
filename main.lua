@@ -62,12 +62,15 @@ function love.load()
 		until batsCave.contents == "empty"
 		batsCave.contents = "bats"
 	end
+	
+	sounds = {}
+	sounds.music = love.audio.newSource("sounds/music.mp3", "stream")
+	sounds.music:setLooping(true)
+	sounds.music:play()
+	sounds.wumpus = love.audio.newSource("sounds/wumpus.mp3", "stream")
+	sounds.bats = love.audio.newSource("sounds/bats.mp3", "stream")
 
 	checkAdjCaveContents()
-	
-	music = love.audio.newSource("sounds/music.mp3", "stream")
-	music:setLooping(true)
-	music:play()
 end
 
 function love.update(dt)
@@ -103,7 +106,7 @@ function love.update(dt)
 			-- move to random empty cave
 			scene.shake = 1000
 			repeat
-				scene.cave = caves[#caves - 1]
+				scene.cave = caves[math.random(#caves) - 1]
 			until scene.cave.contents == "empty"
 			scene.cave:markAsVisited()
 			checkAdjCaveContents()
@@ -112,7 +115,6 @@ function love.update(dt)
 		else
 			checkAdjCaveContents()
 		end
-		-- play appropriate sounds
 	end
 	if scene.dim >= -0.1 and scene.dim < 0 and player.alive then
 		-- allow player mobility
@@ -120,7 +122,7 @@ function love.update(dt)
 		scene.dim = 0
 	end
 
-	-- movement
+	-- attack and movement
 	if player.canMove and player.alive then
 		if player.grenadeReady then
 			if love.keyboard.isDown("left") then
@@ -169,6 +171,7 @@ function checkAdjCaveContents()
 		if caves[scene.cave.adj[i]].contents == "wumpus" then
 			player.statusMessage = player.statusMessage
 			.. "You smell the smelly stench of a Wumpus.\n"
+			sounds.wumpus:play()
 		end
 		if caves[scene.cave.adj[i]].contents == "pit" then
 			player.statusMessage = player.statusMessage
@@ -177,6 +180,7 @@ function checkAdjCaveContents()
 		if caves[scene.cave.adj[i]].contents == "bats" then
 			player.statusMessage = player.statusMessage
 			.. "What's that flapping of wings nearby?\n"
+			sounds.bats:play()
 		end
 	end
 end
@@ -192,17 +196,28 @@ function love.draw()
 	love.graphics.print(scene.cave.name, 25, 25, 0, 1.5, 1.5)
 	love.graphics.print(player.statusMessage, 25, 50, 0, 1.5, 1.5)
 
+	font = love.graphics.newFont("fonts/Roboto-Regular.ttf", 16)
+	left   = love.graphics.newText(font, caves[scene.cave.adj[1]]:getName())
+	right  = love.graphics.newText(font, caves[scene.cave.adj[2]]:getName())
+	top    = love.graphics.newText(font, caves[scene.cave.adj[3]]:getName())
+	bottom = love.graphics.newText(font, caves[scene.cave.adj[4]]:getName())
+	love.graphics.draw(left, 25, 400, 0, 1.5, 1.5)
+	love.graphics.draw(right, 620, 400, 0, 1.5, 1.5)
+	love.graphics.draw(top, 350, 200, 0, 1.5, 1.5)
+	if (#scene.cave.adj >3) then
+		love.graphics.draw(bottom, 400, 700, 0, 1.5, 1.5)
+	end
 	-- adjacent cave names
 	-- left
-	love.graphics.print(caves[scene.cave.adj[1]]:getName(), 25, 400, 0, 1.5, 1.5)
+	-- love.graphics.print(caves[scene.cave.adj[1]]:getName(), 25, 400, 0, 1.5, 1.5)
 	-- right
-	love.graphics.print(caves[scene.cave.adj[2]]:getName(), 620, 400, 0, 1.5, 1.5)
+	-- love.graphics.print(caves[scene.cave.adj[2]]:getName(), 620, 400, 0, 1.5, 1.5)
 	-- top
-	love.graphics.print(caves[scene.cave.adj[3]]:getName(), 350, 200, 0, 1.5, 1.5)
+	-- love.graphics.print(caves[scene.cave.adj[3]]:getName(), 350, 200, 0, 1.5, 1.5)
 	-- bottom
-	if (#scene.cave.adj >3) then
-		love.graphics.print(caves[scene.cave.adj[4]]:getName(), 400, 700, 0, 1.5, 1.5)
-	end
+	-- if (#scene.cave.adj >3) then
+		-- love.graphics.print(caves[scene.cave.adj[4]]:getName(), 400, 700, 0, 1.5, 1.5)
+	-- end
 
 	-- dim overlay
 	love.graphics.setColor(0, 0, 0, math.abs(scene.dim))
@@ -210,47 +225,57 @@ function love.draw()
 
 	-- death screen
 	if not player.alive then
-		love.graphics.setColor(1, 0, 0, math.abs(scene.dim))
-		love.graphics.print(player.statusMessage, 250, 300, 0, 5, 5)
+		if numWumpi <= 0 then
+			love.graphics.setColor(0, 1, 0, math.abs(scene.dim))
+			if player.statusMessage == nil then
+				player.statusMessage = "YOU WIN!"
+			end
+		else
+			love.graphics.setColor(1, 0, 0, math.abs(scene.dim))
+			if player.statusMessage == nil then
+				player.statusMessage = "YOU DIED!"
+			end
+		end
+		scale = 5*9 / #player.statusMessage
+		love.graphics.print(player.statusMessage, 250, 300, 0, scale, scale)
 	end
 end
 
 function toss(tunnel) 
-	hitFlag = false
-	if (player.grenades > 0) then
+	if player.grenades > 0 then
 		player.grenades = player.grenades-1
 		caveNum = scene.cave:getNeighborDownTunnel(tunnel)
 
-		if (scene.cave.contents == "wumpus") then
-			scene.cave.contents = "empty"
-			wumpusCount = wumpusCount-1
-			hitFlag = true
-			-- play nice sound
-		end
-
-		tossedCave = caves[caveNum]
-		for i=1,tossedCave:getNumAdjCaves() do 
-			adjCaveNum = tossedCave:getNeighborDownTunnel(i)
-			adjCave = caves[adjCaveNum]
-
-			if adjCave.contents == "wumpus" then
-				repeat
-					wumpusCave = adjCave.adj[math.random(adjCave:getNumAdjCaves())]
-				until wumpusCave.contents == "empty"
-				if (wumpusCave == scene.cave) then
-					player.statusMessage = "A wumpus moved into your cave!"
-					-- growling noise
-					player.alive = false
-				end
-				wumpusCave.contents = "wumpus"
-				adjCave.contents = "empty"
-			end
-		end
-
-		if (hitFlag) then
+		if caves[caveNum].contents == "wumpus" then
+			caves[caveNum].contents = "empty"
 			player.statusMessage = "You hit and captured a wumpus!"
-		else 
-			player.statusMessage = "The arrow misses and you scared off the wumpus."
+			numWumpi = numWumpi - 1
+			if numWumpi <= 0 then
+				player.statusMessage = "YOU WIN!"
+				player.alive = false
+			end
+			-- play nice sound
+		else
+
+			tossedCave = caves[caveNum]
+			for i=1,tossedCave:getNumAdjCaves() do 
+				adjCaveNum = tossedCave:getNeighborDownTunnel(i)
+				adjCave = caves[adjCaveNum]
+
+				if adjCave.contents == "wumpus" then
+					repeat
+						wumpusCave = caves[adjCave.adj[math.random(adjCave:getNumAdjCaves())]]
+					until wumpusCave.contents == "empty"
+					player.statusMessage = "The arrow misses and you scared off the wumpus."
+					if (wumpusCave == scene.cave) then
+						player.statusMessage = "A wumpus moved into your cave!"
+						-- growling noise
+						player.alive = false
+					end
+					wumpusCave.contents = "wumpus"
+					adjCave.contents = "empty"
+				end
+			end
 		end
 	else
 		player.statusMessage = "You have no arrows left!"
