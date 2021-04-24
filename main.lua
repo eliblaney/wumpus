@@ -68,7 +68,7 @@ function love.update(dt)
 	if player.x <= scene.minX then caveDir = 0 end
 	if player.x >= scene.maxX then caveDir = 1 end
 	if player.scale <= scene.minZ then caveDir = 2 end
-	if player.scale >= scene.maxZ then caveDir = 3 end
+	if player.scale >= scene.maxZ and #scene.cave.adj > 3 then caveDir = 3 end
 	if caveDir > -1 or scene.dim < 0 or not player.alive then
 		player.canMove = false
 		scene.dim = scene.dim + 0.05
@@ -80,12 +80,28 @@ function love.update(dt)
 		player.x = 300
 		player.y = 550
 		player.scale = 0.5
-		-- TODO: Change cave
-		scene.cave = caves[scene.cave.adj[math.random(#scene.cave.adj)] - 1]
+		scene.cave = caves[scene.cave.adj[math.random(#scene.cave.adj)]]
+		scene.cave:markAsVisited()
 		if scene.cave.contents == "wumpus" then
 			player.alive = false
 			player.statusMessage = "YOU DIED!"
 			-- play dead sound
+		else
+			player.statusMessage = ""
+			for i=1,#scene.cave.adj do
+				if caves[scene.cave.adj[i]].contents == "wumpus" then
+					player.statusMessage = player.statusMessage
+						.. "You hear the smelly smell of a Wumpus.\n"
+				end
+				if caves[scene.cave.adj[i]].contents == "pit" then
+					player.statusMessage = player.statusMessage
+						.. "Nearby wind makes you feel chilly.\n"
+				end
+				if caves[scene.cave.adj[i]].contents == "bats" then
+					player.statusMessage = player.statusMessage
+						.. "What's that flapping of wings nearby?\n"
+				end
+			end
 		end
 		-- play appropriate sounds
 	end
@@ -103,8 +119,19 @@ function love.update(dt)
 			player.x = player.x + player.speed*dt
 		elseif love.keyboard.isDown("up") then
 			player.scale = player.scale - player.speed*dt/200
-		elseif love.keyboard.isDown("down") and #scene.cave.adj > 3 then
+		elseif love.keyboard.isDown("down")
+			and #scene.cave.adj > 3
+			and player.scale < scene.maxZ
+			then
 			player.scale = player.scale + player.speed*dt/200
+		elseif love.keyboard.isDown("1") then
+			toss(1)
+		elseif love.keyboard.isDown("2") then
+			toss(2)
+		elseif love.keyboard.isDown("3") then
+			toss(3)
+		elseif love.keyboard.isDown("4") then
+			toss(4)
 		end 
 	end
 end
@@ -129,7 +156,7 @@ function toss(tunnel)
 	hitFlag = false
 	if (player.grenades > 0) then
 		player.grenades = player.grenades-1
-		caveNum = scene.cave.getNeighborDownTunnel(tunnel)
+		caveNum = scene.cave:getNeighborDownTunnel(tunnel)
 
 		if (scene.cave.contents == "wumpus") then
 			scene.cave.contents = "empty"
@@ -139,13 +166,13 @@ function toss(tunnel)
 		end
 
 		tossedCave = caves[caveNum]
-		for i=1, tossedCave:getNumAdjacentCaves(), 1 do 
-			adjCaveNum = tossedCave.getNeighborDownTunnel(i)
+		for i=1,tossedCave:getNumAdjCaves() do 
+			adjCaveNum = tossedCave:getNeighborDownTunnel(i)
 			adjCave = caves[adjCaveNum]
 
-			if (adjCaveNum.contents == "wumpus") then
+			if adjCave.contents == "wumpus" then
 				repeat
-					wumpusCave = adjCave.adj[math.random(adjCave.getNumAdjacentCaves)]
+					wumpusCave = adjCave.adj[math.random(adjCave:getNumAdjCaves())]
 				until wumpusCave.contents == "empty"
 				if (wumpusCave == scene.cave) then
 					player.statusMessage = "A wumpus moved into your cave!"
@@ -162,6 +189,7 @@ function toss(tunnel)
 		else 
 			player.statusMessage = "The stun grenade missed."
 		end
+	else
+		player.statusMessage = "You have no stun grenades to throw!"
 	end
-	player.statusMessage = "You have no stun grenades to throw!"
 end

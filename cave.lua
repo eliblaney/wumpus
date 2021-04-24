@@ -40,7 +40,7 @@ caves[18] = cave:new("The Lost Caverns of the Wyrm", 18, {3, 19, 18, 17})
 caves[19] = cave:new("The Lost Caverns of the Wyrm", 19, {3, 17, 18, 19})
 
 function cave:getNeighborDownTunnel(tunnelNum) 
-    if (tunnelNum >= 0 and tunnelNum < table.getn(self.adj)) then
+    if tunnelNum >= 1 and tunnelNum <= #self.adj then
         return self.adj[tunnelNum]
     end
     return -1
