@@ -65,10 +65,12 @@ function love.load()
 	
 	sounds = {}
 	sounds.music = love.audio.newSource("sounds/music.mp3", "stream")
+	sounds.bats = love.audio.newSource("sounds/bats.mp3", "stream")
+	sounds.wumpus = love.audio.newSource("sounds/wumpus.mp3", "stream")
+	sounds.death = love.audio.newSource("sounds/death.mp3", "stream")
+	sounds.win = love.audio.newSource("sounds/win.wav", "stream")
 	sounds.music:setLooping(true)
 	sounds.music:play()
-	sounds.wumpus = love.audio.newSource("sounds/wumpus.mp3", "stream")
-	sounds.bats = love.audio.newSource("sounds/bats.mp3", "stream")
 
 	font = love.graphics.newFont("fonts/Roboto-Regular.ttf", 24)
 
@@ -100,7 +102,7 @@ function love.update(dt)
 		if scene.cave.contents == "wumpus" then
 			player.alive = false
 			player.statusMessage = "A wumpus kills you!"
-			-- play dead sound
+			sounds.death:play()
 		elseif scene.cave.contents == "pit" then
 			player.alive = false
 			player.statusMessage = "You fell into a pit and died!"
@@ -258,7 +260,7 @@ function toss(tunnel)
 				player.statusMessage = "YOU WIN!"
 				player.alive = false
 			end
-			-- play nice sound
+			sounds.win:play()
 		else
 			player.statusMessage = "The arrow misses."
 			tossedCave = caves[caveNum]
