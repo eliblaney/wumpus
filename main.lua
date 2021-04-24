@@ -59,6 +59,8 @@ function love.load()
 		until batsCave.contents == "empty"
 		batsCave.contents = "bats"
 	end
+
+	checkAdjCaveContents()
 	
 -- 	sound = love.audio.newSource("music.ogg", "stream")
 -- love.audio.play(sound)
@@ -89,22 +91,21 @@ function love.update(dt)
 			player.alive = false
 			player.statusMessage = "YOU DIED!"
 			-- play dead sound
+		elseif scene.cave.contents == "pit" then
+			player.alive = false
+			player.statusMessage = "YOU DIED!"
+		elseif scene.cave.contents == "bats" then
+			-- move to random empty cave
+			scene.shake = 1000
+			repeat
+				scene.cave = caves[#caves - 1]
+			until scene.cave.contents == "empty"
+			scene.cave:markAsVisited()
+			checkAdjCaveContents()
+			player.statusMessage = player.statusMessage
+					.. "You were picked up in a whirlwind of bats!"
 		else
-			player.statusMessage = ""
-			for i=1,#scene.cave.adj do
-				if caves[scene.cave.adj[i]].contents == "wumpus" then
-					player.statusMessage = player.statusMessage
-						.. "You smell the smelly stench of a Wumpus.\n"
-				end
-				if caves[scene.cave.adj[i]].contents == "pit" then
-					player.statusMessage = player.statusMessage
-						.. "Nearby wind makes you feel chilly.\n"
-				end
-				if caves[scene.cave.adj[i]].contents == "bats" then
-					player.statusMessage = player.statusMessage
-						.. "What's that flapping of wings nearby?\n"
-				end
-			end
+			checkAdjCaveContents()
 		end
 		-- play appropriate sounds
 	end
@@ -116,37 +117,62 @@ function love.update(dt)
 
 	-- movement
 	if player.canMove and player.alive then
-		if love.keyboard.isDown("left") then
-			player.x = player.x - player.speed*dt
-		elseif love.keyboard.isDown("right") then
-			player.x = player.x + player.speed*dt
-		elseif love.keyboard.isDown("up") then
-			player.scale = player.scale - player.speed*dt/200
-		elseif love.keyboard.isDown("down")
-			and #scene.cave.adj > 3
-			and player.scale < scene.maxZ
-			then
-			player.scale = player.scale + player.speed*dt/200
-		elseif player.grenadeReady and love.keyboard.isDown("1") then
-			toss(1)
-			player.grenadeReady = false
-		elseif player.grenadeReady and love.keyboard.isDown("2") then
-			toss(2)
-			player.grenadeReady = false
-		elseif player.grenadeReady and love.keyboard.isDown("3") then
-			toss(3)
-			player.grenadeReady = false
-		elseif player.grenadeReady and love.keyboard.isDown("4") then
-			toss(4)
-			player.grenadeReady = false
-		elseif not player.grenadeReady and love.keyboard.isDown("g") then
-			if player.grenades > 0 then
-				player.grenadeReady = true
-				player.statusMessage = "You hold up your grenade"
-			else 
-				player.statusMessage = "You have no stun grenades to throw!"
+		if player.grenadeReady then
+			if love.keyboard.isDown("left") then
+				toss(1)
+				player.grenadeReady = false
+			elseif love.keyboard.isDown("right") then
+				toss(2)
+				player.grenadeReady = false
+			elseif love.keyboard.isDown("up") then
+				toss(3)
+				player.grenadeReady = false
+			elseif love.keyboard.isDown("down") then
+				toss(4)
+				player.grenadeReady = false
+			elseif love.keyboard.isDown("escape") then
+				player.statusMessage = "You lower your bow."
+				player.grenadeReady = false
 			end
-		end 
+		else
+			if love.keyboard.isDown("left") then
+				player.x = player.x - player.speed*dt
+			elseif love.keyboard.isDown("right") then
+				player.x = player.x + player.speed*dt
+			elseif love.keyboard.isDown("up") then
+				player.scale = player.scale - player.speed*dt/200
+			elseif love.keyboard.isDown("down")
+				and #scene.cave.adj > 3
+				and player.scale < scene.maxZ
+				then
+					player.scale = player.scale + player.speed*dt/200
+			elseif love.keyboard.isDown("g") then
+				if player.grenades > 0 then
+					player.grenadeReady = true
+					player.statusMessage = "You hold up your grenade"
+				else 
+					player.statusMessage = "You have no stun grenades to throw!"
+				end
+			end
+		end
+	end
+end
+
+function checkAdjCaveContents()
+	player.statusMessage = ""
+	for i=1,#scene.cave.adj do
+		if caves[scene.cave.adj[i]].contents == "wumpus" then
+			player.statusMessage = player.statusMessage
+			.. "You smell the smelly stench of a Wumpus.\n"
+		end
+		if caves[scene.cave.adj[i]].contents == "pit" then
+			player.statusMessage = player.statusMessage
+			.. "Nearby wind makes you feel chilly.\n"
+		end
+		if caves[scene.cave.adj[i]].contents == "bats" then
+			player.statusMessage = player.statusMessage
+			.. "What's that flapping of wings nearby?\n"
+		end
 	end
 end
 
