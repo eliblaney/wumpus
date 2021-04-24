@@ -80,7 +80,7 @@ function love.update(dt)
 		player.x = 300
 		player.y = 550
 		player.scale = 0.5
-		scene.cave = caves[scene.cave.adj[math.random(#scene.cave.adj)]]
+		scene.cave = caves[scene.cave.adj[caveDir+1]]
 		scene.cave:markAsVisited()
 		if scene.cave.contents == "wumpus" then
 			player.alive = false
@@ -143,8 +143,23 @@ function love.draw()
 	love.graphics.setColor(0, 0, 0, 1)
 	love.graphics.print(scene.cave.name, 25, 25, 0, 1.5, 1.5)
 	love.graphics.print(player.statusMessage, 25, 50, 0, 1.5, 1.5)
+
+	--adjacent caves
+	love.graphics.print(caves[scene.cave.adj[1]]:getName(), 25, 400, 0, 1.5, 1.5)
+	love.graphics.print(caves[scene.cave.adj[2]]:getName(), 350, 200, 0, 1.5, 1.5)
+	love.graphics.print(caves[scene.cave.adj[3]]:getName(), 700, 400, 0, 1.5, 1.5)
+	-- love.graphics.print(caves[scene.cave.adj[1]]:getName(), 25, 400, 0, 1.5, 1.5)
+
+
 	love.graphics.setColor(0, 0, 0, math.abs(scene.dim))
 	love.graphics.rectangle('fill', 0, 0, 808, 800)
+
+
+
+
+	-- for k,v in pairs(cave.adj) do
+	-- 	love.graphics.print(v.getName(), 25, 25, 0, 1.5, 1.5)
+	-- end
 
 	if not player.alive then
 		love.graphics.setColor(1, 0, 0, math.abs(scene.dim))
