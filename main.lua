@@ -16,20 +16,23 @@ function love.load()
 
 	player = {}
 	player.img = love.graphics.newImage("images/character.png")
-	player.x = 300
-	player.y = 550
-	player.scale = 0.5
+	player.x = 500
+	player.y = 650
+	player.scale = 0.9
 	player.speed = 300
 	player.canMove = true
 	player.alive = true
 	player.statusMessage = ""
 	player.grenadeReady = false
 
+	caveImg:setFilter("nearest", "nearest")
+	player.img:setFilter("nearest", "nearest")
+
 	scene = {}
 	scene.minX = 200
-	scene.maxX = 600
-	scene.minZ = 0.3
-	scene.maxZ = 0.7
+	scene.maxX = 800
+	scene.minZ = 0.6
+	scene.maxZ = 1.2
 	scene.dim = 0
 	scene.cave = caves[0]
 	scene.cave:markAsVisited()
@@ -81,9 +84,10 @@ function love.update(dt)
 	if scene.dim >= 1 and player.alive then
 		-- change cave in complete darkness
 		scene.dim = -1
-		player.x = 300
-		player.y = 550
-		player.scale = 0.5
+		player.x = 500
+		player.y = 650
+		player.scale = 0.9
+		player.speed = 300
 		player.grenadeReady = false
 		scene.cave = caves[scene.cave.adj[caveDir+1]]
 		scene.cave:markAsVisited()
@@ -180,7 +184,7 @@ function love.draw()
 	-- cave & player models
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.draw(caveImg, 0, 0)
-	love.graphics.draw(player.img, player.x, player.y, 0, player.scale, player.scale, 250, 450)
+	love.graphics.draw(player.img, player.x, player.y, 0, player.scale, player.scale, 250, 350)
 
 	-- cave name and status message
 	love.graphics.setColor(0, 0, 0, 1)
