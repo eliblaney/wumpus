@@ -70,6 +70,8 @@ function love.load()
 	sounds.wumpus = love.audio.newSource("sounds/wumpus.mp3", "stream")
 	sounds.bats = love.audio.newSource("sounds/bats.mp3", "stream")
 
+	font = love.graphics.newFont("fonts/Roboto-Regular.ttf", 24)
+
 	checkAdjCaveContents()
 end
 
@@ -193,31 +195,32 @@ function love.draw()
 
 	-- cave name and status message
 	love.graphics.setColor(0, 0, 0, 1)
-	love.graphics.print(scene.cave.name, 25, 25, 0, 1.5, 1.5)
-	love.graphics.print(player.statusMessage, 25, 50, 0, 1.5, 1.5)
+	caveText = love.graphics.newText(font, scene.cave.name)
+	love.graphics.draw(caveText, 25, 25, 0, 0.75, 0.85)
+	statusText = love.graphics.newText(font, player.statusMessage)
+	love.graphics.draw(statusText, 25, 50, 0, 0.75, 0.85)
 
-	font = love.graphics.newFont("fonts/Roboto-Regular.ttf", 16)
+	-- adjacent cave names
 	left   = love.graphics.newText(font, caves[scene.cave.adj[1]]:getName())
 	right  = love.graphics.newText(font, caves[scene.cave.adj[2]]:getName())
 	top    = love.graphics.newText(font, caves[scene.cave.adj[3]]:getName())
-	bottom = love.graphics.newText(font, caves[scene.cave.adj[4]]:getName())
-	love.graphics.draw(left, 25, 400, 0, 1.5, 1.5)
-	love.graphics.draw(right, 620, 400, 0, 1.5, 1.5)
-	love.graphics.draw(top, 350, 200, 0, 1.5, 1.5)
 	if (#scene.cave.adj >3) then
-		love.graphics.draw(bottom, 400, 700, 0, 1.5, 1.5)
+		bottom = love.graphics.newText(font, caves[scene.cave.adj[4]]:getName())
 	end
-	-- adjacent cave names
-	-- left
-	-- love.graphics.print(caves[scene.cave.adj[1]]:getName(), 25, 400, 0, 1.5, 1.5)
-	-- right
-	-- love.graphics.print(caves[scene.cave.adj[2]]:getName(), 620, 400, 0, 1.5, 1.5)
-	-- top
-	-- love.graphics.print(caves[scene.cave.adj[3]]:getName(), 350, 200, 0, 1.5, 1.5)
-	-- bottom
-	-- if (#scene.cave.adj >3) then
-		-- love.graphics.print(caves[scene.cave.adj[4]]:getName(), 400, 700, 0, 1.5, 1.5)
-	-- end
+	love.graphics.setColor(0, 0, 0, 0.8)
+	love.graphics.rectangle('fill', 20, 395, left:getWidth() + 10, left:getHeight() + 10)
+	love.graphics.rectangle('fill', 600, 395, right:getWidth() + 10, right:getHeight() + 10)
+	love.graphics.rectangle('fill', 345, 195, top:getWidth() + 10, top:getHeight() + 10)
+	if (#scene.cave.adj >3) then
+		love.graphics.rectangle('fill', 395, 695, bottom:getWidth() + 10, bottom:getHeight() + 10)
+	end
+	love.graphics.setColor(1, 1, 1, 0.8)
+	love.graphics.draw(left, 25, 400, 0)
+	love.graphics.draw(right, 605, 400, 0)
+	love.graphics.draw(top, 350, 200, 0)
+	if (#scene.cave.adj >3) then
+		love.graphics.draw(bottom, 400, 700, 0)
+	end
 
 	-- dim overlay
 	love.graphics.setColor(0, 0, 0, math.abs(scene.dim))
@@ -236,8 +239,9 @@ function love.draw()
 				player.statusMessage = "YOU DIED!"
 			end
 		end
-		scale = 5*9 / #player.statusMessage
-		love.graphics.print(player.statusMessage, 250, 300, 0, scale, scale)
+		scale = 3*9 / #player.statusMessage
+		endText = love.graphics.newText(font, player.statusMessage)
+		love.graphics.draw(endText, 250, 300, 0, scale, scale)
 	end
 end
 
