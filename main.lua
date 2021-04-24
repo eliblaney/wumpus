@@ -5,7 +5,7 @@ function love.load()
 	config.maxWumpi = 3
 	config.maxPits = 1
 	config.maxBats = 1
-	config.width = 808
+	config.width = 800
 	config.height = 800
 	config.title = "Hunt the Wumpus"
 
@@ -65,8 +65,9 @@ function love.load()
 
 	checkAdjCaveContents()
 	
--- 	sound = love.audio.newSource("music.ogg", "stream")
--- love.audio.play(sound)
+	music = love.audio.newSource("sounds/music.mp3", "stream")
+	music:setLooping(true)
+	music:play()
 end
 
 function love.update(dt)
