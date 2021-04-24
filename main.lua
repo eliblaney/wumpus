@@ -1,3 +1,4 @@
+require "cave"
 
 function love.load()
 	love.window.setMode(808, 800, nil)
@@ -19,6 +20,7 @@ function love.load()
 	scene.minZ = 0.3
 	scene.maxZ = 0.7
 	scene.dim = 0
+	scene.cave = caves[0]
 	
 -- 	sound = love.audio.newSource("music.ogg", "stream")
 -- love.audio.play(sound)
@@ -69,6 +71,8 @@ function love.draw()
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.draw(caveImg, 0, 0)
 	love.graphics.draw(player.img, player.x, player.y, 0, player.scale, player.scale, 250, 450)
+	love.graphics.setColor(0, 0, 0, 1)
+	love.graphics.print(scene.cave.name, 25, 25, 0, 1.5, 1.5)
 	love.graphics.setColor(0, 0, 0, math.abs(scene.dim))
 	love.graphics.rectangle('fill', 0, 0, 808, 800)
 end
