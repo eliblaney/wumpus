@@ -23,7 +23,6 @@ function love.load()
 	player.canMove = true
 	player.alive = true
 	player.statusMessage = ""
-	player.grenades = 3 --FIX THIS
 	player.grenadeReady = false
 
 	scene = {}
@@ -37,6 +36,7 @@ function love.load()
 
 	math.randomseed(os.time())
 	numWumpi = math.random(config.maxWumpi)
+	player.grenades = 3 * numWumpi
 	for i=1,numWumpi do
 		repeat
 			wumpusCave = caves[math.random(#caves) - 1]
@@ -142,9 +142,9 @@ function love.update(dt)
 		elseif not player.grenadeReady and love.keyboard.isDown("g") then
 			if player.grenades > 0 then
 				player.grenadeReady = true
-				player.statusMessage = "You hold up your grenade"
+				player.statusMessage = "You hold up your bow"
 			else 
-				player.statusMessage = "You have no stun grenades to throw!"
+				player.statusMessage = "You have no arrows left!"
 			end
 		end 
 	end
@@ -162,7 +162,7 @@ function love.draw()
 	--left
 	love.graphics.print(caves[scene.cave.adj[1]]:getName(), 25, 400, 0, 1.5, 1.5)
 	--right
-	love.graphics.print(caves[scene.cave.adj[2]]:getName(), 700, 400, 0, 1.5, 1.5)
+	love.graphics.print(caves[scene.cave.adj[2]]:getName(), 620, 400, 0, 1.5, 1.5)
 	--top
 	love.graphics.print(caves[scene.cave.adj[3]]:getName(), 350, 200, 0, 1.5, 1.5)
 	if (#scene.cave.adj >3) then
@@ -220,11 +220,11 @@ function toss(tunnel)
 		end
 
 		if (hitFlag) then
-			player.statusMessage = "You stunned and captured a wumpus!"
+			player.statusMessage = "You hit and captured a wumpus!"
 		else 
-			player.statusMessage = "The stun grenade missed."
+			player.statusMessage = "The arrow misses and you scared off the wumpus."
 		end
 	else
-		player.statusMessage = "You have no stun grenades to throw!"
+		player.statusMessage = "You have no arrows left!"
 	end
 end
