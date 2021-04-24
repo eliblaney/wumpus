@@ -25,7 +25,7 @@ caves[3] = cave:new("The Hall of Kings", 3, {3, 7, 4, 5})
 caves[4] = cave:new("The Silver Mirror", 4, {12, 0, 8, 3})
 caves[5] = cave:new("The Gallimaufry", 5, {8, 3, 9, 11})
 caves[6] = cave:new("The Den of Iniquity", 6, {14, 13, 2, 7})
-caves[7] = cave:new("The Findledelve", 7, {3, 3, 6, 19})
+caves[7] = cave:new("The Findledelve", 7, {3, 6, 19})
 caves[8] = cave:new("The Page of the Deniers", 8, {3, 5, 1, 4})
 caves[9] = cave:new("The Final Tally", 9, {0, 10, 12, 5})
 caves[10] = cave:new("Ess Four", 10, {2, 9, 15})
@@ -50,7 +50,7 @@ function cave:getName()
     if (self.visited) then
         return self.name
     end
-    return "unknown"
+    return "Unknown"
 end
 
 function cave:getNumber() 

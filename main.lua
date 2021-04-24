@@ -32,6 +32,7 @@ function love.load()
 	scene.maxZ = 0.7
 	scene.dim = 0
 	scene.cave = caves[0]
+	scene.cave:markAsVisited()
 
 	math.randomseed(os.time())
 	numWumpi = math.random(config.maxWumpi)
@@ -91,7 +92,7 @@ function love.update(dt)
 			for i=1,#scene.cave.adj do
 				if caves[scene.cave.adj[i]].contents == "wumpus" then
 					player.statusMessage = player.statusMessage
-						.. "You hear the smelly smell of a Wumpus.\n"
+						.. "You smell the smelly stench of a Wumpus.\n"
 				end
 				if caves[scene.cave.adj[i]].contents == "pit" then
 					player.statusMessage = player.statusMessage
@@ -145,10 +146,16 @@ function love.draw()
 	love.graphics.print(player.statusMessage, 25, 50, 0, 1.5, 1.5)
 
 	--adjacent caves
+	--left
 	love.graphics.print(caves[scene.cave.adj[1]]:getName(), 25, 400, 0, 1.5, 1.5)
-	love.graphics.print(caves[scene.cave.adj[2]]:getName(), 350, 200, 0, 1.5, 1.5)
-	love.graphics.print(caves[scene.cave.adj[3]]:getName(), 700, 400, 0, 1.5, 1.5)
-	-- love.graphics.print(caves[scene.cave.adj[1]]:getName(), 25, 400, 0, 1.5, 1.5)
+	--right
+	love.graphics.print(caves[scene.cave.adj[2]]:getName(), 700, 400, 0, 1.5, 1.5)
+	--top
+	love.graphics.print(caves[scene.cave.adj[3]]:getName(), 350, 200, 0, 1.5, 1.5)
+	if (#scene.cave.adj >3) then
+		love.graphics.print(caves[scene.cave.adj[4]]:getName(), 400, 700, 0, 1.5, 1.5)
+	end
+
 
 
 	love.graphics.setColor(0, 0, 0, math.abs(scene.dim))
